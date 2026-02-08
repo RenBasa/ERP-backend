@@ -11,7 +11,11 @@ export class ClientService {
   }
 
   async findAll(): Promise<Client[]> {
-    return await this.prisma.client.findMany();
+    return await this.prisma.client.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    });
   }
 
   async findOne(id: number): Promise<Client> {
