@@ -105,6 +105,7 @@ model Order {
   date         DateTime
   status       String
   total        Float
+  amountPaid   Float         @default(0)
   userId       Int
   clientId     Int?
   Client       Client?       @relation(fields: [clientId], references: [id])

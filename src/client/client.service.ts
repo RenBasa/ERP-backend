@@ -11,6 +11,7 @@ export class ClientService {
   }
 
   async findAll(): Promise<Client[]> {
+    console.log('findAll debug');
     return await this.prisma.client.findMany({
       orderBy: {
         name: 'asc',
