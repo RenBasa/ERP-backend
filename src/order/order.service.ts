@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Order, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { createOrderDto } from './dto/createOrderDto.dto';
@@ -349,5 +349,59 @@ export class OrderService {
 
       return { count: processedCount };
     });
+  }
+
+  async addPayment(orderId: number, amount: number): Promise<Order> {
+    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+
+    if (!order) {
+      throw new NotFoundException(`Order ID ${orderId} not found`);
+    }
+
+    const newAmountPaid = order.amountPaid + amount;
+
+    if (newAmountPaid > order.total) {
+      throw new BadRequestException(
+        `Payment of ${amount} would exceed order total. ` +
+        `Total: ${order.total}, already paid: ${order.amountPaid}, remaining: ${order.total - order.amountPaid}`,
+      );
+    }
+
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { amountPaid: newAmountPaid },
+      include: {
+        Client: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findAllWithUpfrontPayment(): Promise<Order[]> {
+    const orders = await this.prisma.order.findMany({
+      where: {
+        amountPaid: { gt: 0 },
+      },
+      include: {
+        Client: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+      orderBy: { date: 'desc' },
+    });
+    return orders.filter((order) => order.amountPaid < order.total);
   }
 }

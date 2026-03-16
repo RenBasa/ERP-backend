@@ -7,6 +7,7 @@ export class createOrderDto {
   status: string;
   readonly total: number;
   orderDetails: OrderDetail[];
+  amountPaid?: number;
   userId: number;
   clientId: number;
   date: Date;

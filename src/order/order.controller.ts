@@ -15,6 +15,7 @@ import { Order, Prisma } from '@prisma/client';
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 import { createOrderDto } from './dto/createOrderDto.dto';
 import { ReleaseOrderDto } from './dto/releaseOrderDto.dto';
+import { AddPaymentDto } from './dto/addPaymentDto.dto';
 
 @UseGuards(JWTAuthGuard)
 @Controller('order')
@@ -49,6 +50,11 @@ export class OrderController {
   @Get('pending')
   async findAllPending(): Promise<Order[]> {
     return this.orderService.findAllPending();
+  }
+
+  @Get('upfront')
+  async findAllWithUpfrontPayment(): Promise<Order[]> {
+    return this.orderService.findAllWithUpfrontPayment();
   }
 
   @Get(':id')
@@ -104,6 +110,14 @@ export class OrderController {
   ): Promise<Order> {
     return this.orderService.update(+id, data);
   }
+  @Patch(':id/payment')
+  async addPayment(
+    @Param('id') id: string,
+    @Body() addPaymentDto: AddPaymentDto,
+  ): Promise<Order> {
+    return this.orderService.addPayment(+id, addPaymentDto.amount);
+  }
+
   @Patch(':id/status')
   async updateStatus(
     @Param('id') id: string,
