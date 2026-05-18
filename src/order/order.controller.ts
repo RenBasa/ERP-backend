@@ -43,8 +43,11 @@ export class OrderController {
   }
 
   @Get()
-  async findAll(@Query('recent') recent): Promise<Order[]> {
-    return this.orderService.findAll(recent);
+  async findAll(
+    @Query('recent') recent,
+    @Query('cursor') cursor?: number,
+  ): Promise<Order[]> {
+    return this.orderService.findAll(recent, cursor);
   }
 
   @Get('pending')
@@ -53,8 +56,10 @@ export class OrderController {
   }
 
   @Get('upfront')
-  async findAllWithUpfrontPayment(): Promise<Order[]> {
-    return this.orderService.findAllWithUpfrontPayment();
+  async findAllWithUpfrontPayment(
+    @Query('cursor') cursor?: number,
+  ): Promise<Order[]> {
+    return this.orderService.findAllWithUpfrontPayment(cursor);
   }
 
   @Get(':id')
