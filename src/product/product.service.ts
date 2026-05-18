@@ -233,16 +233,35 @@ export class ProductService {
     const equivalencies = product.equivalentUnits;
     delete product.equivalentUnits;
     // console.log(equivalencies);
-    for (const equivalency of equivalencies) {
+    
+    // Separate existing (to update) and new (to create) equivalent units
+    const toUpdate = equivalencies.filter((eq) => eq.id != null && eq.id > 0);
+    const toCreate = equivalencies.filter((eq) => !eq.id || eq.id <= 0);
+
+    // Update existing equivalent units
+    for (const equivalency of toUpdate) {
       await this.prisma.equivalentUnit.update({
         where: {
           id: equivalency.id,
         },
         data: {
           equivalent: equivalency.equivalent,
+          unitId: equivalency.unitId,
         },
       });
     }
+
+    // Create new equivalent units
+    if (toCreate.length > 0) {
+      await this.prisma.equivalentUnit.createMany({
+        data: toCreate.map((eq) => ({
+          equivalent: eq.equivalent,
+          unitId: eq.unitId,
+          productId: id,
+        })),
+      });
+    }
+
     const updateProduct: Prisma.ProductUpdateInput = {
       ...product,
 
