@@ -5,7 +5,35 @@ import { createOrderDto } from './dto/createOrderDto.dto';
 
 @Injectable()
 export class OrderService {
+  private readonly PAGE_SIZE = 30;
+
   constructor(private prisma: PrismaService) {}
+
+  private listInclude = {
+    Client: true,
+    user: {
+      select: {
+        id: true,
+        username: true,
+        first_name: true,
+        last_name: true,
+      },
+    },
+  };
+
+  private paginationArgs(
+    cursor?: number,
+  ): Pick<Prisma.OrderFindManyArgs, 'cursor' | 'skip' | 'take'> {
+    const parsedCursor = cursor ? +cursor : undefined;
+    if (parsedCursor) {
+      return {
+        cursor: { id: parsedCursor },
+        skip: 1,
+        take: this.PAGE_SIZE,
+      };
+    }
+    return { take: this.PAGE_SIZE };
+  }
 
   async create(data: createOrderDto, userId: number): Promise<Order> {
     const date = new Date(Date.now());
@@ -52,7 +80,7 @@ export class OrderService {
     });
   }
 
-  async findAll(recent: string): Promise<Order[]> {
+  async findAll(recent: string, cursor?: number): Promise<Order[]> {
     let statusFilter = {};
     const recentStatus = recent === 'true';
     if (recentStatus) {
@@ -64,18 +92,9 @@ export class OrderService {
     }
     return this.prisma.order.findMany({
       where: statusFilter,
-      include: {
-        Client: true,
-        user: {
-          select: {
-            id: true,
-            username: true,
-            first_name: true,
-            last_name: true,
-          },
-        },
-      },
-      orderBy: { date: 'desc' },
+      include: this.listInclude,
+      orderBy: [{ date: 'desc' }, { id: 'desc' }],
+      ...this.paginationArgs(cursor),
     });
   }
 
@@ -384,24 +403,14 @@ export class OrderService {
     });
   }
 
-  async findAllWithUpfrontPayment(): Promise<Order[]> {
-    const orders = await this.prisma.order.findMany({
+  async findAllWithUpfrontPayment(cursor?: number): Promise<Order[]> {
+    return this.prisma.order.findMany({
       where: {
-        amountPaid: { gt: 0 },
+        amountPaid: { gt: 0, lt: this.prisma.order.fields.total },
       },
-      include: {
-        Client: true,
-        user: {
-          select: {
-            id: true,
-            username: true,
-            first_name: true,
-            last_name: true,
-          },
-        },
-      },
-      orderBy: { date: 'desc' },
+      include: this.listInclude,
+      orderBy: [{ date: 'desc' }, { id: 'desc' }],
+      ...this.paginationArgs(cursor),
     });
-    return orders.filter((order) => order.amountPaid < order.total);
   }
 }
