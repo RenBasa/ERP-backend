@@ -14,7 +14,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  app.enableCors();
+  app.enableCors({ exposedHeaders: ['X-Refreshed-Token'] });
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}/`);
 }
