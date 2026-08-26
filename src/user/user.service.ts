@@ -22,6 +22,7 @@ export class UserService {
         first_name: true,
         last_name: true,
         rol: true,
+        active: true,
       },
     });
   }
@@ -35,6 +36,7 @@ export class UserService {
         first_name: true,
         last_name: true,
         rol: true,
+        active: true,
       },
     });
   }
