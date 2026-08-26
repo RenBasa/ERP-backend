@@ -11,8 +11,11 @@ import {
 import { OrderDetailService } from './order-detail.service';
 import { OrderDetail, Prisma } from '@prisma/client';
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 
-@UseGuards(JWTAuthGuard)
+@UseGuards(JWTAuthGuard, RolesGuard)
+@Roles('admin')
 @Controller('order-detail')
 export class OrderDetailController {
   constructor(private readonly orderDetailService: OrderDetailService) {}

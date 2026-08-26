@@ -13,8 +13,11 @@ import { InventoryService } from './inventory.service';
 import { Inventory, Prisma } from '@prisma/client';
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 import { InventoryDTO } from './entities/inventory.entity';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 
-@UseGuards(JWTAuthGuard)
+@UseGuards(JWTAuthGuard, RolesGuard)
+@Roles('admin')
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
