@@ -17,6 +17,9 @@ export class AuthService {
     if (!passwordMatch) {
       throw new UnauthorizedException();
     }
+    if (!user.active) {
+      throw new UnauthorizedException();
+    }
     const { ...result } = user;
     return result;
   }
