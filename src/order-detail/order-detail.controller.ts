@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderDetailService } from './order-detail.service';
 import { OrderDetail, Prisma } from '@prisma/client';
+import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JWTAuthGuard)
 @Controller('order-detail')
 export class OrderDetailController {
   constructor(private readonly orderDetailService: OrderDetailService) {}

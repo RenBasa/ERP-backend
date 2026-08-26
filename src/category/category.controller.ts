@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { Category, Prisma } from '@prisma/client';
+import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JWTAuthGuard)
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
