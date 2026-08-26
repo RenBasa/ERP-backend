@@ -2,8 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { EquivalentUnitService } from './equivalent-unit.service';
 import { EquivalentUnit, Prisma } from '@prisma/client';
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 
-@UseGuards(JWTAuthGuard)
+@UseGuards(JWTAuthGuard, RolesGuard)
+@Roles('admin')
 @Controller('equivalent-unit')
 export class EquivalentUnitController {
   constructor(private readonly equivalentUnitService: EquivalentUnitService) {}

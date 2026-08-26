@@ -27,8 +27,8 @@ export class AuthService {
   }
 
   // used in controller
-  async loginJWT(id: number, username: string) {
-    const payload = { id: id, username: username };
+  async loginJWT(id: number, username: string, rol: string) {
+    const payload = { id: id, username: username, rol: rol };
     return await this.jwtService.signAsync(payload);
   }
 
