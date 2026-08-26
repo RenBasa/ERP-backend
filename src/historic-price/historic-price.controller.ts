@@ -2,8 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { HistoricPriceService } from './historic-price.service';
 import { HistoricPrice, Prisma } from '@prisma/client';
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 
-@UseGuards(JWTAuthGuard)
+@UseGuards(JWTAuthGuard, RolesGuard)
+@Roles('admin')
 @Controller('historic-price')
 export class HistoricPriceController {
   constructor(private readonly historicPriceService: HistoricPriceService) {}

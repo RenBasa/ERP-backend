@@ -14,6 +14,7 @@ export class AuthController {
     const token = await this.authService.loginJWT(
       request.user.id,
       request.user.username,
+      request.user.rol,
     );
     return {
       access_token: token,

@@ -29,6 +29,7 @@ export class TokenRefreshInterceptor implements NestInterceptor {
           const refreshedToken = this.jwtService.sign({
             id: decoded.id,
             username: decoded.username,
+            rol: decoded.rol,
           });
           response.setHeader('X-Refreshed-Token', refreshedToken);
         }
