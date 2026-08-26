@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product, Prisma } from '@prisma/client';
 import { createProductDto, updateProductDto } from './dto/createProduct.dto';
+import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JWTAuthGuard)
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}

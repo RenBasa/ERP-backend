@@ -6,15 +6,13 @@ import {
   Patch,
   Param,
   Delete,
-  // UseGuards, // remove to have jwt guard
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, Prisma } from '@prisma/client';
-/*
- * Remove comment to have JWT guard
- * import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
- * @UseGuards(JWTAuthGuard)
- */
+import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
+
+@UseGuards(JWTAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

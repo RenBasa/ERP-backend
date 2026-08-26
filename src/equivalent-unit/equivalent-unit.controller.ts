@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { EquivalentUnitService } from './equivalent-unit.service';
 import { EquivalentUnit, Prisma } from '@prisma/client';
+import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JWTAuthGuard)
 @Controller('equivalent-unit')
 export class EquivalentUnitController {
   constructor(private readonly equivalentUnitService: EquivalentUnitService) {}
