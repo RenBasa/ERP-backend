@@ -18,6 +18,11 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
     // deactivated user is locked out immediately, rather than only once
     // their existing token happens to expire (up to 60h later). Also
     // picks up a role change immediately for the same reason.
+    // A token without a numeric id can't name a user; rejecting it here
+    // gives a 401 instead of a 500 from the lookup below.
+    if (!Number.isInteger(payload?.id)) {
+      throw new UnauthorizedException();
+    }
     const user = await this.userService.findOne(payload.id);
     if (!user || !user.active) {
       throw new UnauthorizedException();

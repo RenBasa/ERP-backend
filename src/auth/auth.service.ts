@@ -13,6 +13,10 @@ export class AuthService {
   // used in local.stategy
   async validateUser(username: string, pass: string): Promise<User> {
     const user = await this.userService.loginFind(username);
+    // An unknown username is a failed login (401), not a server error.
+    if (!user) {
+      throw new UnauthorizedException();
+    }
     const passwordMatch = await bcrypt.compare(pass, user.password);
     if (!passwordMatch) {
       throw new UnauthorizedException();
