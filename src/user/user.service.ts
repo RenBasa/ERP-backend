@@ -68,6 +68,7 @@ export class UserService {
     targetId: number,
     change: {
       remove?: boolean;
+      password?: boolean;
       active?: unknown;
       rol?: unknown;
       username?: unknown;
@@ -90,6 +91,14 @@ export class UserService {
     const renames =
       change.username !== undefined && change.username !== target.username;
     const losesAccess = change.remove || deactivates || demotes;
+
+    // The printer's password is hard-coded in the printer app, so changing it
+    // here would stop printing until that app is rebuilt.
+    if (SERVICE_ACCOUNTS.includes(target.username) && change.password) {
+      throw new BadRequestException(
+        `${target.username} es la cuenta de un dispositivo; su contraseña no se puede cambiar desde aquí.`,
+      );
+    }
 
     if (
       SERVICE_ACCOUNTS.includes(target.username) &&
@@ -136,13 +145,20 @@ export class UserService {
     });
     const userQuery = await this.prisma.user.update({
       where: { id },
-      data: { ...user, password: undefined },
+      // `id` is ignored: the frontend sends it back unchanged, and a
+      // different value would rewrite the user's primary key.
+      data: { ...user, id: undefined, password: undefined },
     });
     delete userQuery.password;
     return userQuery;
   }
 
-  async updatePassword(id: number, password: string): Promise<User> {
+  async updatePassword(
+    actorId: number,
+    id: number,
+    password: string,
+  ): Promise<User> {
+    await this.assertSafeChange(actorId, id, { password: true });
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 

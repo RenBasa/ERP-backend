@@ -48,8 +48,9 @@ export class UserController {
   async updatePassword(
     @Param('id') id: string,
     @Body() body: { password: string },
+    @Req() req,
   ): Promise<User> {
-    return this.userService.updatePassword(+id, body.password);
+    return this.userService.updatePassword(req.user.id, +id, body.password);
   }
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req): Promise<void> {
